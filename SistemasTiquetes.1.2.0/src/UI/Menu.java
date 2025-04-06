@@ -13,9 +13,13 @@ public class Menu{
             System.out.println("2- Gestión de bl.Tiquetes");
             System.out.println("3- Salir");
             System.out.print("Ingrese una opción: ");
-            int opcion = sc.nextInt();
-            sc.nextLine();
-
+            int opcion = 0;
+            try{
+                opcion = Integer.parseInt(sc.nextLine());
+            }catch(NumberFormatException e){
+                System.out.println("Opción no válida. Ingrese un número válido.");
+                continue;
+            }
             switch(opcion){
                 case 1:
                     MenuUsuarios.main(null);
