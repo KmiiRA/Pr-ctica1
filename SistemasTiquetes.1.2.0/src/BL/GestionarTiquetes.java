@@ -24,12 +24,21 @@ public class GestionarTiquetes{
         System.out.println("2 - Tiquete de Cambio");
         System.out.println("3 - Tiquete de Servicio");
         System.out.print("Opción: ");
-        int tipo = sc.nextInt();
-        sc.nextLine();
-
+        int tipo = 0;
+        try{
+            tipo = Integer.parseInt(sc.nextLine());
+        }catch (NumberFormatException e){
+            System.out.println("Por favor ingrese un número válido.");
+            return;
+        }
         System.out.print("Código: ");
-        int codigo = sc.nextInt();
-        sc.nextLine();
+        int codigo = 0;
+        try{
+            codigo = Integer.parseInt(sc.nextLine());
+        }catch (NumberFormatException e){
+            System.out.println("Por favor ingrese un número válido.");
+            return;
+        }
         System.out.print("Descripción: ");
         String descripcion = sc.nextLine();
         System.out.print("Estado: ");
@@ -71,31 +80,45 @@ public class GestionarTiquetes{
     }
 
     public static void modificarTiquete(){
-        System.out.print("Ingrese el código del tiquete a modificar: ");
-        int codigo = sc.nextInt();
-        sc.nextLine();
-
-        for (Tiquetes t : tiquetes){
-            if (t.getCodigo() == codigo){
+        int codigo = 0;
+        try{
+            System.out.print("Ingrese el código del tiquete a modificar: ");
+            codigo = Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("Por favor ingrese un número válido.");
+            return;
+        }
+        for(Tiquetes t : tiquetes){
+            if(t.codigo == codigo){
                 System.out.print("Ingrese el nuevo estado: ");
-                String nuevoEstado = sc.nextLine();
-                t.setEstado(nuevoEstado);
+                t.estado = sc.nextLine();
                 System.out.println("Estado del tiquete actualizado.");
                 return;
             }
         }
-
         System.out.println("No se encontró ningun tiquete con ese código.");
     }
 
     public static void eliminarTiquete(){
-        System.out.print("Ingrese el código del tiquete a eliminar: ");
-        int codigo = sc.nextInt();
-        sc.nextLine();
-
-        if (tiquetes.removeIf(t -> t.getCodigo() == codigo)) {
+        int codigo = 0;
+        try{
+            System.out.print("Ingrese el código del tiquete a eliminar: ");
+            codigo = Integer.parseInt(sc.nextLine());
+        }catch (NumberFormatException e) {
+            System.out.println("Por favor ingrese un número válido.");
+            return;
+        }
+        Tiquetes encontrado = null;
+        for(Tiquetes t : tiquetes){
+            if (t.codigo == codigo){
+                encontrado = t;
+                break;
+            }
+        }
+        if (encontrado != null){
+            tiquetes.remove(encontrado);
             System.out.println("Tiquete eliminado con éxito.");
-        } else {
+        }else{
             System.out.println("No se encontró un tiquete con ese código.");
         }
     }
