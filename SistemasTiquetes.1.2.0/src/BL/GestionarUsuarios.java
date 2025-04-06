@@ -22,8 +22,13 @@ public class GestionarUsuarios{
 
     public static void registrarUsuario(){
         System.out.print("Código: ");
-        int codigo = sc.nextInt();
-        sc.nextLine();
+        try{
+            System.out.print("Código: ");
+            codigo = Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("Por favor ingrese un número válido.");
+            return;
+        }
         System.out.print("Nombre: ");
         String nombre = sc.nextLine();
         System.out.print("Primer Apellido: ");
@@ -42,9 +47,14 @@ public class GestionarUsuarios{
     }
 
     public static void modificarUsuario(){
-        System.out.print("Ingrese el código del usuario a modificar: ");
-        int codigo = sc.nextInt();
-        sc.nextLine();
+        int codigo = 0;
+        try{
+            System.out.print("Ingrese el código del usuario a modificar: ");
+            codigo = Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("Por favor ingrese un número válido.");
+            return;
+        }
 
         for(Usuarios u : usuarios){
             if (u.getCodigo() == codigo){
@@ -78,14 +88,28 @@ public class GestionarUsuarios{
     }
 
     public static void eliminarUsuario(){
-        System.out.print("Ingrese el código del usuario a eliminar: ");
-        int codigo = sc.nextInt();
-        sc.nextLine();
+        int codigo = 0;
+        try{
+            System.out.print("Ingrese el código del usuario a eliminar: ");
+            codigo = Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("Por favor ingrese un número válido.");
+            return;
+        }
 
-        if(usuarios.removeIf(u -> u.getCodigo() == codigo)){
+        Usuarios encontrado = null;
+        for(Usuarios u : usuarios){
+            if(u.getCodigo() == codigo){
+                encontrado = u;
+                break;
+            }
+        }
+
+        if(encontrado != null){
+            usuarios.remove(encontrado);
             System.out.println("Usuario eliminado con éxito.");
         }else{
-            System.out.println("No se encontró un usuario con ese código.");
+            System.out.println("Usuario no encontrado.");
         }
     }
 
