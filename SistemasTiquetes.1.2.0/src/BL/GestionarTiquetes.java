@@ -1,7 +1,9 @@
 package BL;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class GestionarTiquetes{
@@ -14,8 +16,19 @@ public class GestionarTiquetes{
         }else{
             for(Tiquetes t:tiquetes){
                 t.mostrarInfo();
+                t.mostrarNotas();
             }
         }
+    }
+
+    public static String listarTiquetesComoTexto(){
+        if(tiquetes.isEmpty())return "No existen tiquetes registrados.";
+        StringBuilder sb=new StringBuilder();
+        for(Tiquetes t:tiquetes){
+            sb.append(t.toString()).append("\n");
+            sb.append(t.getNotasComoTexto()).append("\n\n");
+        }
+        return sb.toString();
     }
 
     public static void crearTiquete(){
@@ -54,32 +67,26 @@ public class GestionarTiquetes{
         String notas=sc.nextLine();
 
         switch(tipo){
-            case 1://Tiquete de Incidente
+            case 1:
                 System.out.print("Impacto: ");
                 String impacto=sc.nextLine();
-                tiquetes.add(new TiqueteIncidente(codigo,descripcion,estado,usuarioCreador,tecnicoAsignado,impacto,notas));
+                crearTiqueteIncidente(codigo,descripcion,estado,usuarioCreador,tecnicoAsignado,impacto,notas);
                 break;
-            case 2://Tiquete de Cambio
-                System.out.print("Fecha Requerida (Formato YYYY-MM-DD): ");
+            case 2:
+                System.out.print("Fecha Requerida (YYYY-MM-DD): ");
                 String fechaRequerida=sc.nextLine();
-                System.out.print("Fecha de Ejecución (Formato YYYY-MM-DD): ");
+                System.out.print("Fecha de Ejecución (YYYY-MM-DD): ");
                 String fechaEjecucion=sc.nextLine();
                 System.out.print("Pasos Requeridos: ");
                 String pasosRequeridos=sc.nextLine();
-                tiquetes.add(new TiqueteCambio(codigo,descripcion,estado,usuarioCreador,tecnicoAsignado,fechaRequerida,fechaEjecucion,pasosRequeridos,notas));
+                crearTiqueteCambio(codigo,descripcion,estado,usuarioCreador,tecnicoAsignado,fechaRequerida,fechaEjecucion,pasosRequeridos,notas);
                 break;
-            case 3://Tiquete de Servicio
-                System.out.print("Nivel de prioridad: ");
-                int prioridad=0;
-                try{
-                    prioridad=Integer.parseInt(sc.nextLine());
-                }catch(NumberFormatException e){
-                    System.out.println("Por favor ingrese un número válido.");
-                    return;
-                }
+            case 3:
                 System.out.print("Justificación del servicio: ");
-                String justificacionServicio=sc.nextLine();
-                tiquetes.add(new TiqueteServicio(codigo,descripcion,estado,usuarioCreador,tecnicoAsignado,justificacionServicio,prioridad,notas));
+                String justificacion=sc.nextLine();
+                System.out.print("Nivel de prioridad: ");
+                int prioridad=Integer.parseInt(sc.nextLine());
+                crearTiqueteServicio(codigo,descripcion,estado,usuarioCreador,tecnicoAsignado,justificacion,prioridad);
                 break;
             default:
                 System.out.println("Opción no válida. No se creó ningún tiquete.");
@@ -132,4 +139,213 @@ public class GestionarTiquetes{
             System.out.println("No se encontró un tiquete con ese código.");
         }
     }
+
+    public static void cambiarEstadoTiquete(){
+        System.out.print("Ingrese el código del tiquete: ");
+        int codigo=0;
+        try{
+            codigo=Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("Código inválido");
+            return;
+        }
+
+        for(Tiquetes t:tiquetes){
+            if(t.codigo==codigo){
+                System.out.println("Estado actual: "+t.estado);
+                System.out.print("Ingrese nuevo estado (Asignado, En Progreso, Resuelto, Cancelado): ");
+                String nuevoEstado=sc.nextLine();
+                t.estado=nuevoEstado;
+                System.out.println("Estado actualizado");
+                return;
+            }
+        }
+
+        System.out.println("No se encontró un tiquete con ese código");
+    }
+
+    public static void agregarNota(){
+        System.out.print("Ingrese el código del tiquete: ");
+        int codigo=0;
+        try{
+            codigo=Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("Código no válido");
+            return;
+        }
+
+        for(Tiquetes t:tiquetes){
+            if(t.codigo==codigo){
+                System.out.print("Escriba la nota a agregar: ");
+                String nota=sc.nextLine();
+                t.agregarNota(nota);
+                System.out.println("Nota agregada");
+                return;
+            }
+        }
+
+        System.out.println("No se encontró un tiquete con ese código");
+    }
+
+    public static void asignarTecnico(){
+        System.out.print("Ingrese el código del tiquete: ");
+        int codigo=0;
+        try{
+            codigo=Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("Código no válido");
+            return;
+        }
+
+        for(Tiquetes t:tiquetes){
+            if(t.codigo==codigo){
+                System.out.print("ID del técnico a asignar: ");
+                int tecnico=0;
+                try{
+                    tecnico=Integer.parseInt(sc.nextLine());
+                }catch(NumberFormatException e){
+                    System.out.println("ID no válido");
+                    return;
+                }
+                t.tecnicoAsignado=tecnico;
+                System.out.println("Técnico asignado correctamente");
+                return;
+            }
+        }
+
+        System.out.println("No se encontró un tiquete con ese código");
+    }
+
+    public static void listarTiquetesPorEstado(){
+        System.out.print("Ingrese el estado: ");
+        String estado=sc.nextLine();
+        boolean encontrado=false;
+        for(Tiquetes t:tiquetes){
+            if(t.estado.equalsIgnoreCase(estado)){
+                t.mostrarInfo();
+                t.mostrarNotas();
+                encontrado=true;
+            }
+        }
+        if(!encontrado){
+            System.out.println("No hay tiquetes con ese estado");
+        }
+    }
+
+    public static void listarTiquetesPorCreador(){
+        System.out.print("Ingrese ID del creador: ");
+        int id=0;
+        try{
+            id=Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("ID no válido");
+            return;
+        }
+        boolean encontrado=false;
+        for(Tiquetes t:tiquetes){
+            if(t.usuarioCreador==id){
+                t.mostrarInfo();
+                t.mostrarNotas();
+                encontrado=true;
+            }
+        }
+        if(!encontrado){
+            System.out.println("No hay tiquetes de ese creador");
+        }
+    }
+
+    public static void listarTiquetesPorTecnico(){
+        System.out.print("Ingrese ID del técnico: ");
+        int id=0;
+        try{
+            id=Integer.parseInt(sc.nextLine());
+        }catch(NumberFormatException e){
+            System.out.println("ID no válido");
+            return;
+        }
+        boolean encontrado=false;
+        for(Tiquetes t:tiquetes){
+            if(t.tecnicoAsignado==id){
+                t.mostrarInfo();
+                t.mostrarNotas();
+                encontrado=true;
+            }
+        }
+        if(!encontrado){
+            System.out.println("No hay tiquetes asignados a ese técnico");
+        }
+    }
+
+    public static void mostrarEstadisticas(){
+        int total=tiquetes.size();
+        int incidentes=0;
+        int cambios=0;
+        int servicios=0;
+        Map<String,Integer> estados=new HashMap<>();
+
+        for(Tiquetes t:tiquetes){
+            if(t instanceof TiqueteIncidente){
+                incidentes++;
+            }else if(t instanceof TiqueteCambio){
+                cambios++;
+            }else if(t instanceof TiqueteServicio){
+                servicios++;
+            }
+
+            estados.put(t.estado,estados.getOrDefault(t.estado,0)+1);
+        }
+
+        System.out.println("Total de tiquetes: "+total);
+        System.out.println("Incidentes: "+incidentes);
+        System.out.println("Cambios: "+cambios);
+        System.out.println("Servicios: "+servicios);
+        System.out.println("Por estado:");
+        for(String e:estados.keySet()){
+            System.out.println("- "+e+": "+estados.get(e));
+        }
+    }
+
+    //Crear Tiquete de Incidente
+    public static void crearTiqueteIncidente(int codigo,String descripcion,String estado,int creador,int tecnico,String impacto,String nota){
+        TiqueteIncidente t=new TiqueteIncidente(codigo,descripcion,estado,creador,tecnico,impacto);
+        t.agregarNota(nota);
+        tiquetes.add(t);
+    }
+
+    //Crear Tiquete de Cambio
+    public static void crearTiqueteCambio(int codigo,String descripcion,String estado,int creador,int tecnico,String fechaReq,String fechaEjec,String pasos,String nota){
+        TiqueteCambio t=new TiqueteCambio(codigo,descripcion,estado,creador,tecnico,fechaReq,fechaEjec,pasos);
+        t.agregarNota(nota);
+        tiquetes.add(t);
+    }
+
+    //Crear Tiquete de Servicio
+    public static void crearTiqueteServicio(int codigo,String descripcion,String estado,int creador,int tecnico,String justificacion,int prioridad,String nota){
+        TiqueteServicio t=new TiqueteServicio(codigo,descripcion,estado,creador,tecnico,justificacion,prioridad);
+        t.agregarNota(nota);
+        tiquetes.add(t);
+    }
+
+    //Eliminar tiquete por código
+    public static boolean eliminarTiquetePorCodigo(int codigo){
+        for(Tiquetes t:tiquetes){
+            if(t.codigo==codigo){
+                tiquetes.remove(t);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //Modificar estado de tiquete
+    public static boolean modificarEstadoTiquete(int codigo,String nuevoEstado){
+        for(Tiquetes t:tiquetes){
+            if(t.codigo==codigo){
+                t.estado=nuevoEstado;
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
